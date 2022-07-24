@@ -7,17 +7,6 @@ const router = require('./routes');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-mongoose
-  .connect('mongodb://localhost:27017/mestodb', {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
-  .then((result) => {
-    console.log(`Успешное подключение к базе '${result.connection.name}'`);
-  })
-  .catch((err) => console.error(`ERROR: ${err}`));
-
 app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   req.user = {
@@ -30,5 +19,16 @@ app.use(bodyParser.json());
 app.use(router);
 
 app.listen(PORT, () => {
+  mongoose
+    .connect('mongodb://localhost:27017/mestodb', {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+    })
+    .then((result) => {
+      console.log(`Успешное подключение к базе '${result.connection.name}'`);
+    })
+    .catch((err) => console.error(`ERROR: ${err}`));
+
   console.log('Сервер запущен');
 });

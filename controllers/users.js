@@ -10,7 +10,7 @@ const getUser = (req, res) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        res.status(404).send({
+        res.status(400).send({
           message: 'Пользователь по указанному _id не найден',
         });
         return;
@@ -43,7 +43,7 @@ const updateUser = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    },
+    }
   )
     .then((user) => {
       if (!user) {
@@ -63,7 +63,7 @@ const updateUser = (req, res) => {
     });
 };
 
-const updateUserAvatar = (req) => {
+const updateUserAvatar = (req, res) => {
   const { _id, avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -73,8 +73,24 @@ const updateUserAvatar = (req) => {
       new: true,
       runValidators: true,
       upsert: true,
-    },
-  ).then();
+    }
+  )
+    .then((user) => {
+      if (!user) {
+        return res
+          .status(404)
+          .send({ message: 'Пользователь с указанным _id не найден' });
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({
+          message: 'Переданы некорректные данные при обновлении профиля',
+        });
+      }
+      return res.status(500).send({ message: 'Ошибка по умолчанию' });
+    });
 };
 
 module.exports = {
