@@ -24,7 +24,7 @@ const createCard = (req, res) => {
   Card.create({ ...req.body })
     .then((card) => res.status(201).send(card))
     .catch((error) => {
-      if (error.name === 'Validationerroror') {
+      if (error.name === 'ValidationError') {
         return res.status(400).send({
           message: 'Переданы некорректные данные при создании карточки',
         });
@@ -33,20 +33,38 @@ const createCard = (req, res) => {
     });
 };
 
-const likeCard = (req) => {
+const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
-  );
+  )
+    .then((card) => res.end(card))
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({
+          message: 'Переданы некорректные данные при создании карточки',
+        });
+      }
+      return res.status(500).send({ message: 'Ошибка по умолчанию' });
+    });
 };
 
-const dislikeCard = (req) => {
+const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
-  );
+  )
+    .then((card) => res.send(card))
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({
+          message: 'Переданы некорректные данные при создании карточки',
+        });
+      }
+      return res.status(500).send({ message: 'Ошибка по умолчанию' });
+    });
 };
 
 module.exports = {
