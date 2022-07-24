@@ -17,7 +17,7 @@ const getUser = (req, res) => {
       }
       res.send(user);
     })
-    .catch((err) => res.status(500).send({ message: 'Ошибка по умолчанию' }));
+    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
 };
 
 const createUser = (req, res) => {
@@ -43,7 +43,7 @@ const updateUser = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    }
+    },
   )
     .then((user) => {
       if (!user) {
@@ -63,7 +63,7 @@ const updateUser = (req, res) => {
     });
 };
 
-const updateUserAvatar = (req, res) => {
+const updateUserAvatar = (req) => {
   const { _id, avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -73,9 +73,8 @@ const updateUserAvatar = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    }
-  )
-    .then((user));
+    },
+  ).then();
 };
 
 module.exports = {
