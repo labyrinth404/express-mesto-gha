@@ -8,14 +8,13 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json());
 app.use((req, res, next) => {
   req.user = {
     _id: '5d8b8592978f8bd833ca8133',
   };
-
   next();
 });
-app.use(bodyParser.json());
 app.use(router);
 
 app.listen(PORT, () => {

@@ -21,8 +21,10 @@ const getCard = (req, res) => {
 };
 
 const createCard = (req, res) => {
+  const { _id } = req.user;
+  req.body.owner = _id;
   Card.create({ ...req.body })
-    .then((card) => res.status(201).send(card))
+    .then((card) => res.status(201).send(card._id))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         return res.status(400).send({
@@ -34,6 +36,7 @@ const createCard = (req, res) => {
 };
 
 const likeCard = (req, res) => {
+  console.log(req.user._id);
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },

@@ -17,7 +17,15 @@ const getUser = (req, res) => {
       }
       res.send(user);
     })
-    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
+    .catch(() => {
+      if (id) {
+        res.status(400).send({
+          message: 'Пользователь по указанному _id не найден',
+        });
+        return;
+      }
+      res.status(500).send({ message: 'Ошибка по умолчанию' });
+    });
 };
 
 const createUser = (req, res) => {
@@ -43,7 +51,7 @@ const updateUser = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    },
+    }
   )
     .then((user) => {
       if (!user) {
@@ -73,7 +81,7 @@ const updateUserAvatar = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    },
+    }
   )
     .then((user) => {
       if (!user) {
