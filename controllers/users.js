@@ -51,7 +51,7 @@ const updateUser = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    }
+    },
   )
     .then((user) => {
       if (!user) {
@@ -81,7 +81,7 @@ const updateUserAvatar = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    }
+    },
   )
     .then((user) => {
       if (!user) {

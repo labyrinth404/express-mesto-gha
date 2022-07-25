@@ -36,7 +36,6 @@ const createCard = (req, res) => {
 };
 
 const likeCard = (req, res) => {
-  console.log(req.user._id);
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
