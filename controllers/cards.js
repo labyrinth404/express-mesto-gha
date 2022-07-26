@@ -24,7 +24,7 @@ const createCard = (req, res) => {
   const { _id } = req.user;
   req.body.owner = _id;
   Card.create({ ...req.body })
-    .then((card) => res.status(201).send({ id: card._id }))
+    .then((card) => res.status(201).send(card))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         return res.status(400).send({
@@ -49,7 +49,7 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.end(card))
+    .then((card) => res.send(card))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         return res.status(400).send({
@@ -69,12 +69,12 @@ const dislikeCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        return res.status(400).send({
+        return res.status(404).send({
           message: 'Переданы некорректные данные для снятии лайка',
         });
       }
       if (req.params.cardId) {
-        return res.status(404).send({
+        return res.status(400).send({
           message: 'Передан несуществующий _id карточки',
         });
       }
