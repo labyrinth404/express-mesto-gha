@@ -1,4 +1,3 @@
-const { ObjectId } = require('bson');
 const mongoose = require('mongoose');
 
 const cardScheme = new mongoose.Schema({
@@ -13,13 +12,13 @@ const cardScheme = new mongoose.Schema({
     required: true,
   },
   owner: {
-    type: ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   likes: {
     type: [
       {
-        type: ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
       },
     ],
     default: [],

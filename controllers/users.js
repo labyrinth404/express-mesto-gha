@@ -1,7 +1,9 @@
 const User = require('../models/user');
 
 const getUsers = (req, res) => {
-  User.find({}).then((users) => res.send(users));
+  User.find({})
+    .then((users) => res.send(users))
+    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
 };
 
 const getUser = (req, res) => {
@@ -17,10 +19,10 @@ const getUser = (req, res) => {
       }
       res.send(user);
     })
-    .catch(() => {
-      if (id) {
+    .catch((error) => {
+      if (error.name === 'CastError') {
         res.status(400).send({
-          message: 'Пользователь по указанному _id не найден',
+          message: 'Переданы некорректные данные',
         });
         return;
       }
@@ -50,7 +52,6 @@ const updateUser = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => {
@@ -80,7 +81,6 @@ const updateUserAvatar = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => {
