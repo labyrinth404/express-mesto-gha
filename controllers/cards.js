@@ -41,7 +41,7 @@ const deleteCard = (req, res) => {
   Card.findOneAndRemove({ _id: id })
     .then((card) => {
       if (!card) {
-        return res.status(404).send('Карточка с указанным _id не найдена');
+        return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       }
       return res.send({ message: 'Карточка успешно удалена' });
     })
@@ -54,7 +54,12 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+      }
+      return res.send(card);
+    })
     .catch((error) => {
       if (error.name === 'ValidationError') {
         return res.status(400).send({
@@ -78,7 +83,7 @@ const dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        return res.status(404).send('Передан несуществующий _id карточки.');
+        return res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
       }
       return res.send(card);
     })
