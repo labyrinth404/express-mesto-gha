@@ -1,7 +1,9 @@
 const Card = require('../models/card');
 
 const getCards = (req, res) => {
-  Card.find({}).then((cards) => res.send(cards));
+  Card.find({})
+    .then((cards) => res.send(cards))
+    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
 };
 
 const getCard = (req, res) => {
