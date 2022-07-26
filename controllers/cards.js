@@ -39,8 +39,13 @@ const deleteCard = (req, res) => {
   const { id } = req.params;
 
   Card.findOneAndRemove({ _id: id })
-    .then(() => res.send({ message: 'Карточка успешно удалена' }))
-    .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена' }));
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send('Карточка с указанным _id не найдена');
+      }
+      return res.send({ message: 'Карточка успешно удалена' });
+    })
+    .catch(() => res.status(400).send({ message: 'Карточка с указанным _id не найдена' }));
 };
 
 const likeCard = (req, res) => {
@@ -56,6 +61,11 @@ const likeCard = (req, res) => {
           message: 'Переданы некорректные данные при создании карточки',
         });
       }
+      if (req.params.cardId) {
+        return res.status(400).send({
+          message: 'Передан несуществующий _id карточки',
+        });
+      }
       return res.status(500).send({ message: 'Ошибка по умолчанию' });
     });
 };
@@ -66,7 +76,12 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send(card))
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send('Передан несуществующий _id карточки.');
+      }
+      return res.send(card);
+    })
     .catch((error) => {
       if (error.name === 'ValidationError') {
         return res.status(404).send({
