@@ -24,7 +24,7 @@ const createCard = (req, res) => {
   const { _id } = req.user;
   req.body.owner = _id;
   Card.create({ ...req.body })
-    .then((card) => res.status(201).send(card._id))
+    .then((card) => res.status(201).send({ id: card._id }))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         return res.status(400).send({
@@ -33,6 +33,14 @@ const createCard = (req, res) => {
       }
       return res.status(500).send({ message: 'Ошибка по умолчанию' });
     });
+};
+
+const deleteCard = (req, res) => {
+  const { id } = req.params;
+
+  Card.findOneAndRemove({ _id: id })
+    .then(() => res.send({ message: 'Карточка успешно удалена' }))
+    .catch(() => res.status(404).send({ message: 'Карточка с указанным _id не найдена' }));
 };
 
 const likeCard = (req, res) => {
@@ -62,7 +70,12 @@ const dislikeCard = (req, res) => {
     .catch((error) => {
       if (error.name === 'ValidationError') {
         return res.status(400).send({
-          message: 'Переданы некорректные данные при создании карточки',
+          message: 'Переданы некорректные данные для снятии лайка',
+        });
+      }
+      if (req.params.cardId) {
+        return res.status(404).send({
+          message: 'Передан несуществующий _id карточки',
         });
       }
       return res.status(500).send({ message: 'Ошибка по умолчанию' });
@@ -73,6 +86,7 @@ module.exports = {
   getCards,
   getCard,
   createCard,
+  deleteCard,
   likeCard,
   dislikeCard,
 };

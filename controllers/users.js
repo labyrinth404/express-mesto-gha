@@ -19,7 +19,7 @@ const getUser = (req, res) => {
     })
     .catch(() => {
       if (id) {
-        res.status(400).send({
+        res.status(404).send({
           message: 'Пользователь по указанному _id не найден',
         });
         return;
