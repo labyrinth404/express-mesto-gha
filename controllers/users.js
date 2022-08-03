@@ -1,13 +1,18 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const getUsers = (req, res) => {
-  User.find({})
+  User.find({}).select('+password')
     .then((users) => res.send(users))
     .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
 };
 
 const getUser = (req, res) => {
-  const { id } = req.params;
+  let { id } = req.params;
+  if (id === 'me') {
+    id = req.user._id;
+  }
 
   User.findById(id)
     .then((user) => {
@@ -18,7 +23,7 @@ const getUser = (req, res) => {
         return;
       }
       res.send(user);
-    })
+    }).select('+password')
     .catch((error) => {
       if (error.name === 'CastError') {
         res.status(400).send({
@@ -31,15 +36,19 @@ const getUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  User.create({ ...req.body })
-    .then((user) => res.status(201).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные при создании пользователя',
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => {
+      req.body.password = hash;
+      User.create({ ...req.body })
+        .then((user) => res.status(201).send(user))
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            return res.status(400).send({
+              message: 'Переданы некорректные данные при создании пользователя',
+            });
+          }
+          return res.status(500).send({ message: 'Ошибка по умолчанию' });
         });
-      }
-      return res.status(500).send({ message: 'Ошибка по умолчанию' });
     });
 };
 
@@ -51,7 +60,7 @@ const updateUser = (req, res) => {
       new: true,
       runValidators: true,
     },
-  )
+  ).select('+password')
     .then((user) => {
       if (!user) {
         return res
@@ -80,7 +89,7 @@ const updateUserAvatar = (req, res) => {
       new: true,
       runValidators: true,
     },
-  )
+  ).select('+password')
     .then((user) => {
       if (!user) {
         return res
@@ -99,10 +108,27 @@ const updateUserAvatar = (req, res) => {
     });
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password).select('+password')
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.cookie('token', token, { httpOnly: true });
+      res.send({ message: 'Ok' });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+};
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
   updateUser,
   updateUserAvatar,
+  login,
 };
