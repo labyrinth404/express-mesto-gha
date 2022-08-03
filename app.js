@@ -16,7 +16,7 @@ app.post('/signup', createUser);
 app.use(auth);
 app.use(router);
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   res.send({ message: err.message });
 });
 
