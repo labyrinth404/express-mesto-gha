@@ -23,7 +23,7 @@ const getUser = (req, res) => {
         return;
       }
       res.send(user);
-    }).select('+password')
+    })
     .catch((error) => {
       if (error.name === 'CastError') {
         res.status(400).send({
@@ -111,7 +111,7 @@ const updateUserAvatar = (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
 
-  User.findUserByCredentials(email, password).select('+password')
+  User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.cookie('token', token, { httpOnly: true });

@@ -16,8 +16,9 @@ app.post('/signup', createUser);
 app.use(auth);
 app.use(router);
 
-app.use((err, req, res) => {
-  res.send({ message: err.message });
+app.use((err, req, res, next) => {
+  res.status(err.statusCode).send({ message: err.message });
+  next();
 });
 
 app.listen(PORT, () => {
