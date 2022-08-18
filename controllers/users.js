@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const getUsers = (req, res) => {
-  User.find({}).select('+password')
+  User.find({})
     .then((users) => res.send(users))
     .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
 };
@@ -60,7 +60,7 @@ const updateUser = (req, res) => {
       new: true,
       runValidators: true,
     },
-  ).select('+password')
+  )
     .then((user) => {
       if (!user) {
         return res
@@ -89,7 +89,7 @@ const updateUserAvatar = (req, res) => {
       new: true,
       runValidators: true,
     },
-  ).select('+password')
+  )
     .then((user) => {
       if (!user) {
         return res
