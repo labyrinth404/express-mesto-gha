@@ -43,7 +43,7 @@ const deleteCard = (req, res) => {
   Card.findOneAndRemove({ _id: id, owner: req.user._id })
     .then((card) => {
       if (!card) {
-        return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+        return res.status(403).send({ message: 'Карточка с указанным _id не найдена' });
       }
       return res.send({ message: 'Карточка успешно удалена' });
     })
