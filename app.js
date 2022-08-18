@@ -12,7 +12,6 @@ const app = express();
 
 app.use(bodyParser.json());
 
-
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
