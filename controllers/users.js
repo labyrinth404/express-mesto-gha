@@ -47,6 +47,9 @@ const createUser = (req, res) => {
               message: 'Переданы некорректные данные при создании пользователя',
             });
           }
+          if (err.code === 11000) {
+            return res.status(409).send({ meassage: 'Пользователь уже существует' });
+          }
           return res.status(500).send({ message: 'Ошибка по умолчанию' });
         });
     });
@@ -115,7 +118,7 @@ const login = (req, res) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.cookie('token', token, { httpOnly: true });
-      res.send({ message: 'Ok' });
+      res.send({ token });
     })
     .catch((err) => {
       res
