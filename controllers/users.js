@@ -40,7 +40,22 @@ const createUser = (req, res) => {
     .then((hash) => {
       req.body.password = hash;
       User.create({ ...req.body })
-        .then((user) => res.status(201).send(user))
+        .then((user) => {
+          const {
+            name,
+            about,
+            avatar,
+            _id,
+            email,
+          } = user;
+          res.status(201).send({
+            name,
+            about,
+            avatar,
+            _id,
+            email,
+          });
+        })
         .catch((err) => {
           if (err.name === 'ValidationError') {
             return res.status(400).send({
