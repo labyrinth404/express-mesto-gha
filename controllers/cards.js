@@ -40,12 +40,13 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   const { id } = req.params;
 
-  Card.findOneAndRemove({ _id: id, owner: req.user._id })
+  Card.findOneAndRemove({ _id: id })
     .then((card) => {
       console.log(card);
       if (!card) {
         return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       }
+      console.log(card.owner, req.user._id);
       if (card.owner !== req.user._id) {
         return res.status(403).send({ message: 'Недостаточно прав!' });
       }
