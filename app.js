@@ -12,19 +12,17 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(2).max(30),
-  }),
-}), login);
+const userCheck = () => {
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required().min(2).max(30),
+    }),
+  });
+};
 
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(2).max(30),
-  }),
-}), createUser);
+app.post('/signin', userCheck, login);
+app.post('/signup', userCheck, createUser);
 
 app.use(auth);
 app.use(router);
